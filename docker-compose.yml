@@ -1,0 +1,41 @@
+version: "3"
+volumes:
+  pgdata:
+services:
+  komek_chat_db:
+    build: ./db
+    container_name: komek_chat_db
+    labels:
+      name: "main OLTP chat rest api database"
+    command: -c 'listen_addresses="*"'
+      -c 'max_connections=100'
+      -c 'shared_buffers=256MB'
+      -c 'work_mem=2621kB'
+      -c 'maintenance_work_mem=64MB'
+      -c 'max_stack_depth=4MB'
+      -c 'effective_io_concurrency=200'
+      -c 'max_worker_processes=3'
+      -c 'max_parallel_workers=3'
+      -c 'synchronous_commit=off'
+      -c 'wal_buffers=7864kB'
+      -c 'max_wal_size=4GB'
+      -c 'min_wal_size=2GB'
+      -c 'checkpoint_completion_target=0.9'
+      -c 'random_page_cost=1.1'
+      -c 'effective_cache_size=768MB'
+      -c 'default_statistics_target=100'
+    environment:
+      - TZ=Asia/Almaty
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1
+      - POSTGRES_DB=chat
+    restart: on-failure
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+networks:
+  backend:
